@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Traffic Light Choices</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#EEF3F8;--card:#fff;--ink:#1B2A41;--muted:#4A5C73;--line:#D5DEE9;--g:#2A8A4F;--y:#F2B705;--r:#C0392B;--tint:#E3EBF4;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#101A2B;--card:#1B2A41;--ink:#EAF0F7;--muted:#A9B8CB;--line:#2E4260;--tint:#243652;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#101A2B;--card:#1B2A41;--ink:#EAF0F7;--muted:#A9B8CB;--line:#2E4260;--tint:#243652;color-scheme:dark}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:500 18px/1.5 Nunito,"Trebuchet MS",Arial,sans-serif}
+.wrap{max-width:560px;margin:0 auto;padding:18px 18px 40px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:22px}
+.brand{display:flex;align-items:center;gap:10px;font:600 20px Fredoka,"Trebuchet MS",sans-serif}
+.lights{display:flex;flex-direction:column;gap:3px;background:var(--ink);padding:5px;border-radius:10px}
+.lights i{width:9px;height:9px;border-radius:50%}
+.lang{display:flex;background:var(--tint);border-radius:999px;padding:3px}
+.lang button{border:0;background:none;color:var(--ink);font:700 15px Nunito,Arial,sans-serif;padding:8px 14px;border-radius:999px;cursor:pointer;min-height:40px}
+.lang button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+h1,h2{font-family:Fredoka,"Trebuchet MS",sans-serif;font-weight:600;line-height:1.15;margin:0 0 12px}
+h1{font-size:38px}h2{font-size:28px}
+p{margin:0 0 16px;color:var(--muted)}
+.panel{background:var(--card);border:2px solid var(--line);border-radius:22px;padding:22px}
+.legend{display:grid;gap:12px;margin:20px 0 24px}
+.legend div{display:flex;align-items:center;gap:14px;font-weight:700;color:var(--ink)}
+.dot{flex:none;width:34px;height:34px;border-radius:50%}
+.g{background:var(--g)}.y{background:var(--y)}.r{background:var(--r)}
+.go{width:100%;min-height:60px;border:0;border-radius:18px;background:var(--ink);color:var(--bg);font:600 22px Fredoka,"Trebuchet MS",sans-serif;cursor:pointer}
+.meta{display:flex;justify-content:space-between;font-weight:700;color:var(--muted);margin-bottom:12px}
+.scene{font-size:64px;line-height:1;margin-bottom:12px}
+.q{font:500 24px/1.3 Fredoka,"Trebuchet MS",sans-serif;margin:0 0 22px}
+.opts{display:grid;gap:12px}
+.opt{display:flex;align-items:center;gap:14px;width:100%;min-height:64px;padding:10px 16px;background:var(--card);color:var(--ink);border:3px solid var(--line);border-radius:18px;font:600 20px Fredoka,"Trebuchet MS",sans-serif;text-align:left;cursor:pointer}
+.opt:disabled{cursor:default}
+.opt.right{border-color:var(--g);background:var(--tint)}
+.opt.wrong{border-color:var(--r)}
+.opt.dim{opacity:.55}
+.fb{margin:18px 0 16px;padding:16px 18px;border-radius:16px;background:var(--tint);color:var(--ink)}
+.fb b{display:block;font:600 22px Fredoka,"Trebuchet MS",sans-serif;margin-bottom:4px}
+.big{font-size:72px;line-height:1;margin-bottom:8px}
+.fact{margin:0 0 16px;padding:14px 16px;border-radius:16px;border:2px dashed var(--y);color:var(--ink);font-size:17px}
+.help{margin:20px 0;padding:16px 18px;border-radius:16px;background:var(--tint);color:var(--ink)}
+button:focus-visible{outline:4px solid var(--y);outline-offset:3px}
+@media (max-width:380px){h1{font-size:32px}.q{font-size:21px}}
+@media (prefers-reduced-motion:no-preference){.opt{transition:border-color .15s,opacity .15s}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="brand"><span class="lights" aria-hidden="true"><i class="r"></i><i class="y"></i><i class="g"></i></span><span id="brand"></span></div>
+  <div class="lang" role="group" aria-label="Language / Bahasa">
+    <button id="b-en" onclick="setLang('en')">EN</button>
+    <button id="b-ms" onclick="setLang('ms')">BM</button>
+  </div>
+</header>
+<main id="app" aria-live="polite"></main>
+</div>
+<script>
+var T={
+en:{brand:"Traffic Light Choices",title:"Traffic Light Choices",intro:"Read each situation and pick the safest choice. Green, yellow or red?",
+ g:"Safe",y:"Ask an adult",r:"Say no, walk away",
+ lg:"Green: a safe, healthy choice",ly:"Yellow: stop and ask a trusted adult",lr:"Red: say no and walk away",
+ start:"Start playing",card:"Card",of:"of",right:"Great choice!",wrong:"Not quite. The best answer is ",
+ next:"Next card",finish:"See my score",done:"Well done!",score:"You got {n} out of {t}.",again:"Play again",fact:"Fun fact",
+ help:"Remember: you can always talk to a parent, a teacher or the school counsellor.",
+ m:["Keep practising!","Good try!","Great job!","Traffic light hero!"],gn:"Green",yn:"Yellow",rn:"Red"},
+ms:{brand:"Pilihan Lampu Isyarat",title:"Pilihan Lampu Isyarat",intro:"Baca setiap situasi dan pilih tindakan yang paling selamat. Hijau, kuning atau merah?",
+ g:"Selamat",y:"Tanya orang dewasa",r:"Tidak, pergi",
+ lg:"Hijau: pilihan yang selamat dan sihat",ly:"Kuning: berhenti dan tanya orang dewasa yang dipercayai",lr:"Merah: katakan tidak dan berjalan pergi",
+ start:"Mula bermain",card:"Kad",of:"daripada",right:"Pilihan yang bagus!",wrong:"Belum tepat. Jawapan terbaik ialah ",
+ next:"Kad seterusnya",finish:"Lihat markah saya",done:"Syabas!",score:"Anda dapat {n} daripada {t}.",again:"Main lagi",fact:"Info menarik",
+ help:"Ingat: anda sentiasa boleh bercakap dengan ibu bapa, guru atau kaunselor sekolah.",
+ m:["Teruskan berlatih!","Cuba yang bagus!","Kerja yang hebat!","Wira lampu isyarat!"],gn:"Hijau",yn:"Kuning",rn:"Merah"}
+};
+var Q=[
+{i:"💊",a:"g",en:["Your mum gives you medicine when you are sick, just as the doctor said.","Medicine is safe when a parent or doctor gives it to you in the right amount."],ms:["Ibu memberi anda ubat apabila anda sakit, seperti yang doktor kata.","Ubat selamat apabila diberi oleh ibu bapa atau doktor dengan jumlah yang betul."]},
+{i:"🌈",a:"y",en:["You find a colourful pill on the playground floor.","Don’t touch it. Tell a teacher or an adult right away."],ms:["Anda terjumpa pil berwarna-warni di atas lantai padang permainan.","Jangan sentuh. Beritahu guru atau orang dewasa dengan segera."]},
+{i:"💨",a:"r",en:["An older kid offers you a vape and says everyone tries it.","Say no, walk away and tell a trusted adult."],ms:["Seorang budak yang lebih tua menawarkan vape dan berkata semua orang cuba.","Katakan tidak, berjalan pergi dan beritahu orang dewasa yang dipercayai."]},
+{i:"🧴",a:"y",en:["You see an open medicine bottle on the kitchen table.","Don’t touch it. Tell your parent or carer."],ms:["Anda nampak botol ubat yang terbuka di atas meja dapur.","Jangan sentuh. Beritahu ibu bapa atau penjaga anda."]},
+{i:"⚽",a:"g",en:["After school you play football and eat fruit with your friends.","Playing sports and eating healthy food keeps your body strong."],ms:["Selepas sekolah, anda bermain bola sepak dan makan buah bersama kawan.","Bersukan dan makan makanan sihat menjaga badan anda kuat."]},
+{i:"🚬",a:"r",en:["A friend says, “Try this cigarette, just once.”","Smoke harms your lungs. Say no and walk away."],ms:["Seorang kawan berkata, “Cuba rokok ini, sekali sahaja.”","Asap rokok merosakkan paru-paru. Katakan tidak dan pergi."]},
+{i:"🍬",a:"y",en:["A friend gives you a strange, unwrapped sweet you have never seen.","Don’t eat it. Ask a trusted adult first."],ms:["Seorang kawan memberi anda gula-gula pelik tanpa pembungkus yang anda tidak pernah lihat.","Jangan makan. Tanya orang dewasa yang dipercayai dahulu."]},
+{i:"🧑‍🏫",a:"g",en:["Someone is pushing you to do something unsafe, so you tell your teacher.","Telling a trusted adult is always a safe choice."],ms:["Seseorang menekan anda untuk buat sesuatu yang tidak selamat, jadi anda beritahu guru.","Memberitahu orang dewasa yang dipercayai sentiasa pilihan yang selamat."]},
+{i:"🏷️",a:"g",en:["Your dad reads the label before giving you cough syrup.","Reading the label and following the directions keeps medicine safe."],ms:["Ayah membaca label sebelum memberi anda ubat batuk.","Membaca label dan mengikut arahan menjadikan ubat selamat."]},
+{i:"🏫",a:"y",en:["You find a lighter and a vape near the school gate.","Don’t pick them up. Tell a teacher."],ms:["Anda terjumpa pemetik api dan vape di dekat pintu pagar sekolah.","Jangan ambil. Beritahu guru."]},
+{i:"🥤",a:"r",en:["At a party, an older cousin says, “Taste my drink, and don’t tell anyone.”","Say no. A safe person never asks you to keep secrets from your parents."],ms:["Di sebuah majlis, sepupu yang lebih tua berkata, “Rasa minuman saya, jangan beritahu sesiapa.”","Katakan tidak. Orang yang baik tidak akan meminta anda berahsia daripada ibu bapa."]},
+{i:"🚶",a:"g",en:["You feel worried about exams, so you go for a walk and talk to your family.","Moving your body and talking to people you trust are healthy ways to handle worry."],ms:["Anda risau tentang peperiksaan, jadi anda berjalan-jalan dan bercakap dengan keluarga.","Bergerak dan bercakap dengan orang yang dipercayai ialah cara sihat untuk menangani rasa risau."]},
+{i:"🙅",a:"r",en:["A friend is smoking behind the school canteen and asks you to join.","Say no and walk away. You can still be friends without joining in."],ms:["Seorang kawan merokok di belakang kantin sekolah dan mengajak anda menyertainya.","Katakan tidak dan pergi. Anda masih boleh berkawan tanpa menyertainya."]},
+{i:"🤒",a:"y",en:["Your sister offers you her headache tablet when your tummy hurts.","Don’t take it. Medicine is for one person only, so ask a parent."],ms:["Kakak anda menawarkan tablet sakit kepalanya apabila perut anda sakit.","Jangan ambil. Ubat hanya untuk seorang sahaja, jadi tanya ibu bapa."]},
+{i:"🥣",a:"g",en:["You drink water and eat breakfast before school.","Water and breakfast give your body and brain energy to learn."],ms:["Anda minum air dan makan sarapan sebelum ke sekolah.","Air dan sarapan memberi tenaga kepada badan dan otak anda untuk belajar."]},
+{i:"📱",a:"r",en:["A stranger online offers you a free vape if you share your home address.","Say no, don’t share anything and tell a parent or teacher."],ms:["Seorang yang tidak dikenali dalam talian menawarkan vape percuma jika anda beri alamat rumah.","Katakan tidak, jangan kongsi apa-apa dan beritahu ibu bapa atau guru."]},
+{i:"🥛",a:"g",en:["You choose water instead of a sugary drink at recess.","Water is the best drink to keep your body hydrated."],ms:["Anda memilih air kosong dan bukannya minuman manis semasa rehat.","Air ialah minuman terbaik untuk memastikan badan anda terhidrat."]},
+{i:"😴",a:"g",en:["You go to bed on time so you can wake up fresh for school.","Enough sleep helps your brain learn and your body grow."],ms:["Anda tidur tepat pada masanya supaya segar untuk ke sekolah.","Tidur yang cukup membantu otak anda belajar dan badan anda membesar."]},
+{i:"🎨",a:"g",en:["When you feel bored, you draw and play with your friends.","Hobbies and games are healthy ways to have fun."],ms:["Apabila berasa bosan, anda melukis dan bermain bersama kawan.","Hobi dan permainan ialah cara sihat untuk bergembira."]},
+{i:"👨‍👩‍👧",a:"g",en:["You tell your family about a worry at the dinner table.","Sharing a worry with people who care about you makes it easier to handle."],ms:["Anda memberitahu keluarga tentang rasa risau semasa makan malam.","Berkongsi rasa risau dengan orang yang menyayangi anda menjadikannya lebih mudah ditangani."]},
+{i:"🏊",a:"g",en:["You join a swimming or sports club after school.","Sports keep your body strong and help you make good friends."],ms:["Anda menyertai kelab renang atau sukan selepas sekolah.","Sukan menguatkan badan dan membantu anda mendapat kawan yang baik."]},
+{i:"🥗",a:"g",en:["You help your family cook a healthy dinner.","Fruits, vegetables and home-cooked meals help your body grow strong."],ms:["Anda membantu keluarga memasak makan malam yang sihat.","Buah-buahan, sayur-sayuran dan masakan rumah membantu badan anda membesar kuat."]},
+{i:"🚑",a:"g",en:["A classmate falls ill at school, so you run to get a teacher.","Getting an adult fast is the right thing to do in an emergency."],ms:["Seorang rakan sekelas jatuh sakit di sekolah, jadi anda berlari memanggil guru.","Mendapatkan orang dewasa dengan cepat ialah tindakan yang betul semasa kecemasan."]},
+{i:"🌳",a:"g",en:["You spend the weekend hiking with your family.","Being active outdoors is a healthy way to spend time together."],ms:["Anda mendaki bersama keluarga pada hujung minggu.","Bergiat aktif di luar ialah cara sihat untuk meluangkan masa bersama."]},
+{i:"🧪",a:"y",en:["You find a cleaning liquid inside an old drink bottle under the sink.","Don’t touch or taste it. Tell an adult right away."],ms:["Anda terjumpa cecair pencuci di dalam botol minuman lama di bawah singki.","Jangan sentuh atau rasa. Beritahu orang dewasa dengan segera."]},
+{i:"💉",a:"y",en:["You see a needle lying on the ground at the park.","Don’t touch it. Tell an adult so they can deal with it safely."],ms:["Anda nampak sebatang jarum di atas tanah di taman.","Jangan sentuh. Beritahu orang dewasa supaya mereka mengendalikannya dengan selamat."]},
+{i:"🏠",a:"y",en:["You see strange tablets lying on a table at your friend’s house.","Don’t touch them. Tell an adult in the house."],ms:["Anda nampak tablet pelik di atas meja di rumah kawan anda.","Jangan sentuh. Beritahu orang dewasa di rumah itu."]},
+{i:"🖍️",a:"y",en:["You feel dizzy from the strong smell of glue at the craft table.","Move away and tell your teacher."],ms:["Anda berasa pening kerana bau gam yang kuat di meja kraf.","Beredar dari situ dan beritahu guru anda."]},
+{i:"🍵",a:"y",en:["Your grandma gives you a herbal drink you have never tried.","Ask your parent first. Even natural drinks can affect your body."],ms:["Nenek anda memberi minuman herba yang anda tidak pernah cuba.","Tanya ibu bapa dahulu. Minuman semula jadi pun boleh memberi kesan kepada badan."]},
+{i:"🧳",a:"y",en:["You find a pill bottle with no label in your grandma’s bag.","Don’t touch it. Ask your grandma or a parent about it."],ms:["Anda terjumpa botol pil tanpa label dalam beg nenek anda.","Jangan sentuh. Tanya nenek atau ibu bapa tentangnya."]},
+{i:"🧃",a:"y",en:["Your drink tastes odd at a picnic.","Stop drinking and tell an adult."],ms:["Minuman anda terasa pelik semasa berkelah.","Berhenti minum dan beritahu orang dewasa."]},
+{i:"🚪",a:"y",en:["You feel sick and the medicine cabinet is open, but no adult is nearby.","Don’t take anything. Go and find an adult."],ms:["Anda berasa tidak sihat dan kabinet ubat terbuka, tetapi tiada orang dewasa berhampiran.","Jangan ambil apa-apa. Pergi cari orang dewasa."]},
+{i:"🚭",a:"r",en:["A teenager at the bus stop offers you a cigarette and says it’s cool.","Say no and walk away. Smoking is not cool."],ms:["Seorang remaja di perhentian bas menawarkan rokok dan berkata ia hebat.","Katakan tidak dan pergi. Merokok tidak hebat."]},
+{i:"🎈",a:"r",en:["A classmate says, “If you’re really my friend, try this vape with me.”","Say no. Real friends don’t pressure you to do unsafe things."],ms:["Seorang rakan sekelas berkata, “Kalau awak kawan saya, cuba vape ini bersama saya.”","Katakan tidak. Kawan sebenar tidak memaksa anda melakukan perkara yang tidak selamat."]},
+{i:"🍫",a:"r",en:["At a festival, someone offers you a chocolate bar and says it has “special” stuff inside.","Say no. Never eat food from people you don’t trust."],ms:["Di sebuah pesta, seseorang menawarkan sebatang coklat dan berkata ia ada bahan “istimewa”.","Katakan tidak. Jangan makan makanan daripada orang yang anda tidak percayai."]},
+{i:"🎒",a:"r",en:["A stranger at the park asks you to hold a small bag and not tell your parents.","Say no and walk away. Tell a trusted adult right away."],ms:["Seorang yang tidak dikenali di taman meminta anda memegang beg kecil dan tidak memberitahu ibu bapa.","Katakan tidak dan pergi. Beritahu orang dewasa yang dipercayai dengan segera."]},
+{i:"🥃",a:"r",en:["A friend says, “Let’s sneak a sip of my dad’s drink.”","Say no. Alcohol is not safe for children."],ms:["Seorang kawan berkata, “Jom curi minum sedikit minuman ayah saya.”","Katakan tidak. Alkohol tidak selamat untuk kanak-kanak."]},
+{i:"🏍️",a:"r",en:["A teen offers you money to carry a package to someone.","Say no and tell a trusted adult. This could put you in danger."],ms:["Seorang remaja menawarkan wang supaya anda menghantar bungkusan kepada seseorang.","Katakan tidak dan beritahu orang dewasa yang dipercayai. Ini boleh membahayakan anda."]},
+{i:"🏃",a:"r",en:["An older kid says special pills will make you run faster on sports day.","Say no. You don’t need pills to do well in sports."],ms:["Seorang budak lebih tua berkata pil istimewa akan membuat anda berlari lebih laju pada hari sukan.","Katakan tidak. Anda tidak perlukan pil untuk berjaya dalam sukan."]},
+{i:"📸",a:"r",en:["A video online shows kids vaping and says you’ll look cool if you copy them.","Say no. Videos often show the fun parts and hide the harm."],ms:["Sebuah video dalam talian menunjukkan kanak-kanak ber-vape dan berkata anda nampak hebat jika meniru mereka.","Katakan tidak. Video sering menunjukkan bahagian yang seronok dan menyembunyikan bahayanya."]}
+];
+var FACTS=[
+["Doctors and pharmacists work out the right amount of medicine for each person’s age and weight.","Doktor dan ahli farmasi mengira jumlah ubat yang betul mengikut umur dan berat setiap orang."],
+["Some medicines look like sweets, so only take them from a trusted adult.","Sesetengah ubat kelihatan seperti gula-gula, jadi hanya ambil daripada orang dewasa yang dipercayai."],
+["Many vapes contain nicotine, which is addictive. Growing bodies and brains are extra sensitive to it.","Banyak vape mengandungi nikotin yang boleh menagih. Badan dan otak yang sedang membesar lebih sensitif terhadapnya."],
+["Medicines should be kept in a high, closed cupboard, out of children’s reach.","Ubat patut disimpan dalam kabinet tinggi yang tertutup, jauh daripada jangkauan kanak-kanak."],
+["Children are advised to get about 60 minutes of active play every day.","Kanak-kanak disyorkan bergiat aktif selama kira-kira 60 minit setiap hari."],
+["Your lungs have tiny hairs called cilia that sweep out dirt. Smoke harms them.","Paru-paru anda mempunyai bulu halus yang dipanggil silia untuk menyapu keluar kotoran. Asap merosakkannya."],
+["Sealed, labelled food has its ingredients printed on it. Unwrapped food doesn’t tell you what is inside.","Makanan yang berlabel mempunyai bahan-bahannya tercetak. Makanan tanpa pembungkus tidak memberitahu apa yang ada di dalamnya."],
+["Many schools have a counsellor whose job is to listen and help.","Banyak sekolah mempunyai kaunselor yang tugasnya mendengar dan membantu."],
+["Medicine labels tell you how much to take and how often.","Label ubat memberitahu berapa banyak ubat yang perlu diambil dan berapa kerap."],
+["Grown-ups know how to put dangerous things away safely.","Orang dewasa tahu cara menyimpan barang berbahaya dengan selamat."],
+["If someone says “don’t tell anyone”, that is a sign to tell a trusted adult.","Jika seseorang berkata “jangan beritahu sesiapa”, itu tanda untuk memberitahu orang dewasa yang dipercayai."],
+["Slow, deep breaths can help your body feel calm.","Tarikan nafas yang perlahan dan dalam boleh membantu badan anda berasa tenang."],
+["Saying no is a skill. The more you practise, the easier it gets.","Berkata tidak ialah satu kemahiran. Semakin kerap berlatih, semakin mudah."],
+["Medicine is chosen for one person, so what helps one person can harm another.","Ubat dipilih untuk seorang sahaja, jadi ubat yang membantu seseorang boleh memudaratkan orang lain."],
+["Your heart beats about 100,000 times every day.","Jantung anda berdegup kira-kira 100,000 kali setiap hari."],
+["Never share your address or personal details with people you meet online.","Jangan kongsi alamat atau butiran peribadi dengan orang yang anda temui dalam talian."],
+["Water helps your body carry nutrients and keep a steady temperature.","Air membantu badan anda membawa nutrien dan mengekalkan suhu yang stabil."],
+["Children aged 6 to 12 need about 9 to 12 hours of sleep every night.","Kanak-kanak berumur 6 hingga 12 tahun memerlukan kira-kira 9 hingga 12 jam tidur setiap malam."],
+["Trying hobbies helps your brain build new skills.","Mencuba hobi membantu otak anda membina kemahiran baharu."],
+["A worry often feels smaller once you say it out loud.","Rasa risau sering terasa lebih kecil selepas anda menyuarakannya."],
+["Exercise helps your brain release chemicals that make you feel happy.","Senaman membantu otak anda mengeluarkan bahan kimia yang membuat anda berasa gembira."],
+["Eating many colours of fruit and vegetables gives your body different vitamins.","Makan buah dan sayur pelbagai warna memberi badan anda pelbagai vitamin."],
+["In Malaysia, adults can call 999 in an emergency.","Di Malaysia, orang dewasa boleh menelefon 999 semasa kecemasan."],
+["Sunshine helps your body make vitamin D, which keeps your bones strong.","Cahaya matahari membantu badan anda menghasilkan vitamin D yang menguatkan tulang."],
+["Dangerous liquids should stay in their original, labelled containers.","Cecair berbahaya patut disimpan dalam bekas asal yang berlabel."],
+["Only trained adults should pick up sharp objects like needles.","Hanya orang dewasa yang terlatih patut mengutip objek tajam seperti jarum."],
+["Even vitamins can harm children if they take too many.","Vitamin pun boleh membahayakan kanak-kanak jika diambil terlalu banyak."],
+["Strong fumes from glue or paint can make you dizzy, so use them with fresh air and an adult nearby.","Wasap kuat daripada gam atau cat boleh membuat anda pening, jadi gunakannya dengan udara segar dan orang dewasa berhampiran."],
+["Herbal medicines can have side effects too, so ask a parent or doctor.","Ubat herba juga boleh mempunyai kesan sampingan, jadi tanya ibu bapa atau doktor."],
+["Labels show the name, dose and expiry date so people take the right medicine.","Label menunjukkan nama, dos dan tarikh luput supaya orang mengambil ubat yang betul."],
+["If food or drink smells or tastes odd, it’s best to stop and ask an adult.","Jika makanan atau minuman berbau atau berasa pelik, lebih baik berhenti dan tanya orang dewasa."],
+["Grown-ups can ask a doctor or pharmacist for advice about medicine.","Orang dewasa boleh meminta nasihat doktor atau ahli farmasi tentang ubat."],
+["Cigarette smoke contains thousands of chemicals, and many are harmful.","Asap rokok mengandungi beribu-ribu bahan kimia dan banyak yang berbahaya."],
+["Vape clouds are not just water vapour. They can contain nicotine and other chemicals.","Asap vape bukan sekadar wap air. Ia boleh mengandungi nikotin dan bahan kimia lain."],
+["Harmful substances can be hidden in food that looks like sweets, so only eat food from people you trust.","Bahan berbahaya boleh disembunyikan dalam makanan yang kelihatan seperti gula-gula, jadi hanya makan makanan daripada orang yang anda percayai."],
+["Safe adults don’t ask children to keep secrets or hold things for them.","Orang dewasa yang baik tidak meminta kanak-kanak berahsia atau memegang barang untuk mereka."],
+["Alcohol can harm growing bodies and brains.","Alkohol boleh membahayakan badan dan otak yang sedang membesar."],
+["Carrying packages for people you don’t know can put you in danger, even if it seems like a small favour.","Membawa bungkusan untuk orang yang anda tidak kenali boleh membahayakan anda, walaupun nampak seperti pertolongan kecil."],
+["Sleep, healthy food and practice help most with sports.","Tidur, makanan sihat dan latihan paling membantu dalam sukan."],
+["Many people who make videos online want likes and views, so not everything is true.","Ramai pembuat video dalam talian mahukan tontonan dan suka, jadi tidak semuanya benar."]
+];
+var lang="en",screen="start",order=[],idx=0,score=0,picked=null,app=document.getElementById("app");
+try{var s=localStorage.getItem("tlc-lang");if(s==="ms"||s==="en")lang=s}catch(e){}
+function shuffle(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function setLang(l){lang=l;try{localStorage.setItem("tlc-lang",l)}catch(e){}render()}
+function go(){order=shuffle(Q.map(function(_,i){return i})).slice(0,10);idx=0;score=0;picked=null;screen="play";render();window.scrollTo(0,0)}
+function pick(c){if(picked)return;picked=c;if(c===Q[order[idx]].a)score++;render()}
+function next(){picked=null;idx++;if(idx>=order.length)screen="end";render();window.scrollTo(0,0)}
+function again(){screen="start";render();window.scrollTo(0,0)}
+function startView(t){return '<div class="panel"><h1>'+t.title+'</h1><p>'+t.intro+'</p><div class="legend"><div><span class="dot g"></span>'+t.lg+'</div><div><span class="dot y"></span>'+t.ly+'</div><div><span class="dot r"></span>'+t.lr+'</div></div><button class="go" onclick="go()">'+t.start+'</button></div>'}
+function playView(t){
+  var q=Q[order[idx]],txt=q[lang],h='<div class="meta"><span>'+t.card+' '+(idx+1)+' '+t.of+' '+order.length+'</span><span>⭐ '+score+'</span></div><div class="panel"><div class="scene" aria-hidden="true">'+q.i+'</div><p class="q" style="color:var(--ink)">'+txt[0]+'</p><div class="opts">';
+  ["g","y","r"].forEach(function(c){
+    var cls="opt";if(picked){if(c===q.a)cls+=" right";else if(c===picked)cls+=" wrong";else cls+=" dim"}
+    h+='<button class="'+cls+'" '+(picked?'disabled':'')+' onclick="pick(\''+c+'\')"><span class="dot '+c+'"></span>'+t[c]+'</button>'});
+  h+='</div>';
+  if(picked){var ok=picked===q.a;h+='<div class="fb"><b>'+(ok?t.right:t.wrong+t[q.a+"n"]+'.')+'</b>'+txt[1]+'</div><div class="fact"><b>💡 '+t.fact+':</b> '+FACTS[order[idx]][lang==="ms"?1:0]+'</div><button class="go" onclick="next()">'+(idx+1>=order.length?t.finish:t.next)+'</button>'}
+  return h+'</div>'}
+function endView(t){
+  var n=score,tot=order.length,m=n>=tot-1?3:n>=tot*0.6?2:n>=tot*0.4?1:0;
+  return '<div class="panel" style="text-align:center"><div class="big" aria-hidden="true">'+(m>=2?"🏆":"🌟")+'</div><h2>'+t.done+' '+t.m[m]+'</h2><p style="color:var(--ink)">'+t.score.replace("{n}",n).replace("{t}",tot)+'</p><div class="help" style="text-align:left">'+t.help+'</div><button class="go" onclick="again()">'+t.again+'</button></div>'}
+function render(){
+  var t=T[lang];document.documentElement.lang=lang;document.getElementById("brand").textContent=t.brand;document.title=t.title;
+  document.getElementById("b-en").setAttribute("aria-pressed",lang==="en");document.getElementById("b-ms").setAttribute("aria-pressed",lang==="ms");
+  app.innerHTML=screen==="start"?startView(t):screen==="play"?playView(t):endView(t)}
+render();
+</script>
+</body>
+</html>
